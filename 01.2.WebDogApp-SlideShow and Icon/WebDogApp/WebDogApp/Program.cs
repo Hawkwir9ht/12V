@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using WebDogApp.Core.Contracts;
+using WebDogApp.Core.Services;
 using WebDogApp.Infrastructure.Data;
 
 namespace WebDogApp
@@ -18,6 +20,9 @@ namespace WebDogApp
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+
+            builder.Services.AddDbContext<ApplicationDbContext >(options => options.UseLazyLoadingProxies()
+            .UseSqlServer(connectionString));
             //    .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddDefaultIdentity<IdentityUser>(options =>
             {
@@ -33,7 +38,11 @@ namespace WebDogApp
 
             builder.Services.AddControllersWithViews();
 
+            builder.Services.AddTransient<IBreedService, BreedService>();
+
             var app = builder.Build();
+
+            app.PrepareDatabase();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
